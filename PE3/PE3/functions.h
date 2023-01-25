@@ -1,0 +1,2 @@
+//function decleration
+void PrintName();
