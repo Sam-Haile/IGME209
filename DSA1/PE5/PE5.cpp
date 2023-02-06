@@ -25,14 +25,25 @@ int main()
         // clear the window with black color
         window.clear(sf::Color::Black);
 
-        // draw everything here...
-        // window.draw(...);
-        sf::CircleShape shape(50);
+        // Define circle
+        sf::CircleShape circle(50);
+        // Define rectangle
+        sf::RectangleShape rectangle(sf::Vector2f(120, 50));
+        // Define triangle
+        sf::CircleShape circleTwo(75);
 
-        // set the shape color to green
-        shape.setFillColor(sf::Color(100, 250, 50));
 
-        window.draw(shape);
+
+        // set the circle color to green
+        circle.setFillColor(sf::Color(100, 250, 50));
+
+        circle.move(150, 150);
+        rectangle.move(300, 400);
+        circleTwo.move(500, 150);
+
+        window.draw(circle);
+        window.draw(rectangle);
+        window.draw(circleTwo);
 
         // end the current frame
         window.display();
