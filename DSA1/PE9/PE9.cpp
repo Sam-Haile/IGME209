@@ -2,11 +2,24 @@
 //
 
 #include <iostream>
+#include "Player.h"
 using namespace std;
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    Player player1 = Player();
+    Player player2 = Player(18, 14, 12);
+
+    Player* player3 = new Player();
+    Player* player4 = new Player(56,49,28);
+
+    player1.printPlayer();
+    player2.printPlayer();
+    player4.printPlayer();
+
+
+
+
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

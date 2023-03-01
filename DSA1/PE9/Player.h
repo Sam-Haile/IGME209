@@ -6,20 +6,16 @@ class Player
 	// public private or protected?
 		//constructor ex) Point();
 		// method ex) int getX();
+
 	public:
-		Player(char* name, int vigor, int endurance, int dexterity);
-		char printPlayer();
+		Player();
+		Player(/*char* name,*/ int vigor, int endurance, int dexterity);
+		void printPlayer();
 
 	private:
-		char* name;
+		//const char* name;
 		int vigor;
 		int endurance;
 		int dexterity;
-
-
-
-
-
-
 };
 

@@ -22,23 +22,28 @@ ex) Point::Point()
 
 Player::Player() 
 {
-	name == "Unknown"; //CHECK 
+	//Use the string 'unknown' below
+	//name
+
 	vigor = 10;
 	endurance = 10;
 	dexterity = 10;
 }
 
-Player::Player(char* name, int vigor, int endurance, int dexterity)
+Player::Player(/*char* name,*/ int vigor, int endurance, int dexterity)
 {
-	this->name = name;
+	//this->name = new char[strlen(name) + 1];
+	//strcpy(this->name, name);
+
 	this->vigor = vigor;
 	this->endurance = endurance;
 	this->dexterity = dexterity;
 }
 
-Player::printPlayer()
+void Player::printPlayer()
 {
-	std::cout << name << std::endl;
-	std::cout << "Strength: " << 
-
+	//std::cout << name << std::endl;
+	std::cout << "Vigor: " << vigor << std::endl;
+	std::cout << "Endurance: " << endurance << std::endl;
+	std::cout << "Dexterity: " << dexterity << std::endl;
 }
