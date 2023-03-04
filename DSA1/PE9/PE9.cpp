@@ -7,19 +7,31 @@ using namespace std;
 
 int main()
 {
-    Player player1 = Player();
-    Player player2 = Player(18, 14, 12);
 
-    Player* player3 = new Player();
-    Player* player4 = new Player(56,49,28);
+	std::cout<< "STACK / DEFAULT CONSTRUCTOR" << endl;
+	Player player1 = Player();
+	player1.printPlayer();
+	std::cout << endl;
 
-    player1.printPlayer();
-    player2.printPlayer();
-    player4.printPlayer();
+	std::cout<< "STACK / PARAMETERIZED CONSTRUCTOR" << endl;
+	char myString[] = "Sam";
+	Player player2 = Player(myString, 18, 21, 25);
+	player2.printPlayer();
+	std::cout << endl;
 
+	std::cout << "HEAP / DEFAULT CONSTRUCTOR" << endl;
+	Player* player3 = new Player();
+	player3->printPlayer();
+	std::cout << endl;
 
+	std::cout << "HEAP / PARAMETERIZED CONSTRUCTOR" << endl;
+	char myString2[] = "Mas";
+	Player* player4 = new Player(myString2, 81, 72, 28);
+	player4->printPlayer();
+	std::cout << endl;
 
-
+	delete[] player3;
+	delete[] player4;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

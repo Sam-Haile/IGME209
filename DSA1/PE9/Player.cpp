@@ -1,49 +1,29 @@
 #include "Player.h"
 #include <iostream>
+#include <string.h>
+using namespace std;
 // Class definitions
 // defines methods constructors and desructors
-
-
-/*
-ex) Point::Point()
-{
-	x = 0;
-	y = 0;
-	
-	
-	Methods – Again, class name
-	before ::
-		int Point::getX() { return x; }
-	int Point::getY() { return y; }
-	
-	
-	}
-*/
-
 Player::Player() 
 {
-	//Use the string 'unknown' below
-	//name
-
-	vigor = 10;
-	endurance = 10;
-	dexterity = 10;
+	m_name = "Uknown";
+	m_vigor = 10;
+	m_endurance = 10;
+	m_dexterity = 10;
 }
 
-Player::Player(/*char* name,*/ int vigor, int endurance, int dexterity)
+Player::Player(char* name, int vigor, int endurance, int dexterity)
 {
-	//this->name = new char[strlen(name) + 1];
-	//strcpy(this->name, name);
-
-	this->vigor = vigor;
-	this->endurance = endurance;
-	this->dexterity = dexterity;
+	m_name = name;
+	m_vigor = vigor;
+	m_endurance = endurance;
+	m_dexterity = dexterity;
 }
 
 void Player::printPlayer()
 {
-	//std::cout << name << std::endl;
-	std::cout << "Vigor: " << vigor << std::endl;
-	std::cout << "Endurance: " << endurance << std::endl;
-	std::cout << "Dexterity: " << dexterity << std::endl;
+	std::cout << "Name: " << m_name << std::endl;
+	std::cout << "Vigor: " << m_vigor << std::endl;
+	std::cout << "Endurance: " << m_endurance << std::endl;
+	std::cout << "Dexterity: " << m_dexterity << std::endl;
 }
