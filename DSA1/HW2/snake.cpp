@@ -55,3 +55,20 @@ void Update(b2World& world, sf::Clock& deltaClock)
 	}
 
 }
+
+void Display(int& targetX, int& targetY, int& playerX, int& playerY) 
+{
+	std::cout << "Target " << targetX << ", " << targetY 
+			  << "--> Snake " << playerX << ", " << playerY << std::endl;
+
+	if (playerX == targetX && playerY == targetY)
+	{
+		std::cout << "Target " << targetX << ", " << targetY
+			<< "--> Snake " << playerX << ", " << playerY << "	TARGET HIT" << std::endl;
+	}
+}
+
+void ApplyForces()
+{
+
+}

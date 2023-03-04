@@ -18,10 +18,16 @@ int main()
 	int enterKey = 13;
 	int key = 0;
 
+
+	// Create world
+	b2Vec2 gravity(0.0f, -9.8f);
+	b2World world(gravity);
+	Clock deltaClock;
+
+
 	cout << "Let's play Gravity Snake!" << endl;
 	cout << "Press Esc key to quit anytime..." << endl;
 	cout << "Press Enter key to begin..." << endl;
-
 
 	do
 	{
@@ -30,29 +36,17 @@ int main()
 			break;
 
 	} while (key != enterKey);
+	key = 0;
+
 
 	while (key != escKey)
 	{
-		// Create the world 
-		// gravity can be changed below
-		b2Vec2 gravity(0.0f, -9.8f);
-		b2World world(gravity);
-		Clock deltaClock;
-
 		Update(world, deltaClock);
-
-
 
 		int key = _getch();
 		if (key == escKey)
 			return 0;
 		std::cout << "Thank you for playing! " << key << std::endl;
+
 	}
-
-
-
-
-
-
-
 }
