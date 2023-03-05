@@ -10,7 +10,6 @@
 #include "snake.h"
 
 using namespace sf;
-using namespace std;
 
 int main()
 {
@@ -29,7 +28,7 @@ int main()
 	//CREATING FLOOR
 	//initialize the ground
 	b2BodyDef groundBodyDef;
-	groundBodyDef.position.Set(0.0f, 0.0f);
+	groundBodyDef.position.Set(0.0f, -5.0f);
 	b2Body* groundBody = world.CreateBody(&groundBodyDef);
 	//Ground Shape
 	b2PolygonShape groundShape;
@@ -82,7 +81,7 @@ int main()
 	// Snake
 	b2BodyDef snakeBodyDef;
 	snakeBodyDef.type = b2_dynamicBody;  //Makes the object move
-	snakeBodyDef.position.Set(0.0f, 4.0f); // Location of the snake
+	snakeBodyDef.position.Set(2.0f, 4.0f); // Location of the snake
 	b2Body* body = world.CreateBody(&snakeBodyDef);
 	// Set shape as square
 	b2PolygonShape dynamicBox;
@@ -97,16 +96,39 @@ int main()
 #pragma endregion
 
 
+#pragma region Target
+
+	// Define a range for the random values
+	const float minX = -5.0f;
+	const float maxX = 5.0f;
+	const float minY = -5.0f;
+	const float maxY = 5.0f;
+
+	// Generate random x and y values within the range
+	float randX = (float)rand() / RAND_MAX * (maxX - minX) + minX;
+	float randY = (float)rand() / RAND_MAX * (maxY - minY) + minY;
+
+	// round random values to tenths
+	randX = std::round(randX * 10) / 10;
+	randY = std::round(randY * 10) / 10;
+
+	//Target with rounded values
+	b2Vec2 targetPos(randX, randY);
+
+
+#pragma endregion
+	
+
 	// Calculating DeltaTime
 	sf::Time deltaTime;
-	bool running = true;
+	bool hitTarget = false;
 	bool jump_pressed = false; // A flag to track if 'jump' has been pressed
 	// Get position and center of box
 	b2Vec2 position = body->GetPosition();
 	b2Vec2 point = body->GetWorldPoint(position);
 
 
-	while (running)
+	while (!hitTarget)
 	{
 		//Calculating time
 		deltaTime = deltaClock.getElapsedTime();
@@ -118,11 +140,12 @@ int main()
 		position = body->GetPosition();
 		point = body->GetWorldPoint(position);
 
+
 		//Round positions to tenths
 		double positionX = std::round(position.x * 10) / 10;
 		double positionY = std::round(position.y * 10) / 10;
 
-		std::cout << "(" << positionX << ", " << positionY << ")" << std::endl;
+		std::cout << "Target "<< targetPos.x << ", " << targetPos.y << " --> " << "Snake " << positionX << ", " << positionY << std::endl;
 
 		// if escape is pressed set running to false
 		bool quit = false;
@@ -135,7 +158,7 @@ int main()
 			switch (key) {
 			case 27:
 				std::cout << "\nTHANKS FOR PLAYING";
-				running = false;
+				hitTarget = true;
 				break;
 			case 'w': {
 				ApplyForces(119, body);
@@ -148,7 +171,7 @@ int main()
 			}
 				break;
 			case 's':
-				std::cout << "S";
+				ApplyForces(115, body);
 				jump_pressed = false;
 				break;
 			case 'd':
@@ -164,10 +187,18 @@ int main()
 				}
 				break;
 			default:
-				std::cout << "erv";
 				break;
 			}
 		}
+
+		// If distance between target and snake is close mark target as hit
+		if (b2Distance(position, targetPos) < 0.1f)
+		{
+			hitTarget = true;
+			std::cout << "Target " << targetPos.x << ", " << targetPos.y << 
+			    " --> " << "Snake " << positionX << ", " << positionY << "	(TARGET HIT)" << std::endl;
+		}
+
 	}
 	return 0;
 }

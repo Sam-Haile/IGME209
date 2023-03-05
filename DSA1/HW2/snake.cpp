@@ -91,8 +91,8 @@ void ApplyForces(int keyPress, b2Body* snakeBody)
 	}
 	case 115: //S
 	{
-		//Apply rightward firce
-		b2Vec2 force(100.0f, 0.0f);
+		//Apply downard force
+		b2Vec2 force(0.0f, -100.0f);
 		snakeBody->ApplyForceToCenter(force, true);
 		break;
 	}
