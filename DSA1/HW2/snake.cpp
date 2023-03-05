@@ -1,5 +1,6 @@
 //define methods
 #include <iostream>
+#include <conio.h> // for input
 #define SFML_STATIC
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -22,7 +23,7 @@ void Update(b2World& world, sf::Clock& deltaClock)
 	// NOTE: Dynamic bodies are affected by forces
 	bodyDef.type = b2_dynamicBody;
 	// Set default position
-	bodyDef.position.Set(0.0f, 9.0f);
+	bodyDef.position.Set(0.0f, 20.0f);
 	// Tell world to create dynamic body
 	b2Body* body = world.CreateBody(&bodyDef);
 
@@ -41,6 +42,7 @@ void Update(b2World& world, sf::Clock& deltaClock)
 	bool running = true;
 	b2Vec2 position;
 
+	
 	while (running)
 	{
 		deltaTime = deltaClock.getElapsedTime();
@@ -51,7 +53,7 @@ void Update(b2World& world, sf::Clock& deltaClock)
 		position = body->GetPosition();
 		std::cout << "(" << position.x << ", " << position.y << ")" << std::endl;
 		// if escape is pressed set running to false
-
+		
 	}
 
 }
@@ -68,7 +70,20 @@ void Display(int& targetX, int& targetY, int& playerX, int& playerY)
 	}
 }
 
-void ApplyForces()
+void ApplyForces(unsigned char key, b2Body& snake)
 {
-
+	key = _getch();
+	switch (key)
+	{
+	case 'w':
+		snake.SetTransform(b2Vec2(10, 20), 0);
+			
+		break;
+	default:
+		break;
+	}
 }
+
+
+void MoveTarget(b2Vec2* target);
+
