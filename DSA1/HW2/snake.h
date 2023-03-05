@@ -16,7 +16,7 @@ void Display(int& targetX, int& targetY, int& playerX, int& playerY);
 /// <summary>
 /// Read key presses and apply a force to the player
 /// </summary>
-void ApplyForces();
+void ApplyForces(int keyPress, b2Body* snake);
 
 
 /// <summary>
