@@ -8,40 +8,54 @@
 #include <SFML/Graphics.hpp>
 #include <Box2D/Box2D.h>
 #include "snake.h"
-
 using namespace sf;
 
 int main()
 {
-	// ASCII codes for keys
-	int escKey = 27;
-	int enterKey = 13;
-	int key = 0;
-
-	// Create world
-	b2Vec2 gravity(0.0f, -.1f);
+	int key = 0; 	// For ASCII keys of various letter inputs
+	int score = 0; 	// Tracks score to display at the end of the game
+	bool jump_pressed = false; // A flag to track if 'jump' has been pressed
+	bool hitTarget = false;
+	// Create the world
+	b2Vec2 gravity(0.0f, -0.1f);
 	b2World world(gravity);
 	Clock deltaClock;
+	/* Vector 2 for position of target
+	 assign the targets position randomly */
+	b2Vec2 targetPos;
+	targetPos = MoveTarget(&targetPos);
 
-#pragma region Creating Floor
+	#pragma region Creating Floor/Roof
 
-	//CREATING FLOOR
 	//initialize the ground
 	b2BodyDef groundBodyDef;
 	groundBodyDef.position.Set(0.0f, -5.0f);
 	b2Body* groundBody = world.CreateBody(&groundBodyDef);
 	//Ground Shape
 	b2PolygonShape groundShape;
-	groundShape.SetAsBox(50.0f, -1.0f); // Set the dimensions to half-width and full-height
+	groundShape.SetAsBox(50.0f, -1.0f);
 	// Create ground fixture
 	b2FixtureDef groundFixtureDef;
 	groundFixtureDef.shape = &groundShape;
+	groundFixtureDef.friction = 0.5f;
 	// Attach fixture to ground body
 	groundBody->CreateFixture(&groundFixtureDef);
 
-#pragma endregion
+	//CREATING ROOF
+	// In case snake goes too high and over a wall
+	b2BodyDef roofBodyDef;
+	roofBodyDef.position.Set(0.0f, 5.0f);
+	b2Body* roofBody = world.CreateBody(&roofBodyDef);
+	b2PolygonShape roofShape;
+	roofShape.SetAsBox(50.0f, -1.0f);
+	b2FixtureDef roofFixtureDef;
+	roofFixtureDef.shape = &roofShape;
+	roofBody->CreateFixture(&roofFixtureDef);
 
-#pragma region Walls
+	#pragma endregion
+
+	#pragma region Walls
+
 	//CREATING RIGHT WALL
 	//initialize the wall body
 	b2BodyDef wallBodyDefR;
@@ -59,24 +73,18 @@ int main()
 	wallBodyR->CreateFixture(&wallFixtureDefR);
 
 	//CREATING LEFT WALL
-	//initialize the wall body
 	b2BodyDef wallBodyDefL;
-	// Position of the wall body
 	wallBodyDefL.position.Set(-7.1f, 0.0f);
 	b2Body* wallBodyL = world.CreateBody(&wallBodyDefL);
-	//Walls Shape
 	b2PolygonShape wallShapeL;
-	// Set the dimensions to half-width and full-height
 	wallShapeL.SetAsBox(1.0f, 50.0f);
-	// Create wall fixture
 	b2FixtureDef wallFixtureDefL;
 	wallFixtureDefL.shape = &wallShapeL;
-	// Attach fixture to ground body
 	wallBodyL->CreateFixture(&wallFixtureDefL);
 
-#pragma endregion
+	#pragma endregion
 
-#pragma region Snake
+	#pragma region Snake
 
 	// Snake
 	b2BodyDef snakeBodyDef;
@@ -93,114 +101,124 @@ int main()
 	fixtureDef.friction = 0.3f;
 	body->CreateFixture(&fixtureDef);
 
-#pragma endregion
+	#pragma endregion
 
+	// Introduce the game and controls
+	#pragma region Intro to Game
+	system("Color 0B");
+	std::cout << "Welcome to Gravity Snake!" << std::endl;
+	std::cout << "\nControls:\nWASD - Move\n\SpaceBar - Jump" << std::endl;
+	std::cout << "\nPress Enter to continue..." << "\nPress Esc to quit..." << std::endl;
 
-#pragma region Target
+	bool validInput = false;
+	while (!validInput)
+	{
 
-	// Define a range for the random values
-	const float minX = -5.0f;
-	const float maxX = 5.0f;
-	const float minY = -5.0f;
-	const float maxY = 5.0f;
+		char key = _getch();
+		switch (key) {
+			// If player wants to quit
+		case 27:
+		{
+			system("Color 0B");
+			hitTarget = true;
+			validInput = true;
+			break;
+		}
+		// If player wants to continue 
+		case 13:
+			system("Color 0F");
+			hitTarget = false; //Resume while loop
+			validInput = true;
+			break;
+		default:
+			break;
+		}
+	}
+	#pragma endregion
 
-	// Generate random x and y values within the range
-	float randX = (float)rand() / RAND_MAX * (maxX - minX) + minX;
-	float randY = (float)rand() / RAND_MAX * (maxY - minY) + minY;
-
-	// round random values to tenths
-	randX = std::round(randX * 10) / 10;
-	randY = std::round(randY * 10) / 10;
-
-	//Target with rounded values
-	b2Vec2 targetPos(randX, randY);
-
-
-#pragma endregion
-	
-
-	// Calculating DeltaTime
-	sf::Time deltaTime;
-	bool hitTarget = false;
-	bool jump_pressed = false; // A flag to track if 'jump' has been pressed
-	// Get position and center of box
-	b2Vec2 position = body->GetPosition();
-	b2Vec2 point = body->GetWorldPoint(position);
-
-
+	//Main game logic
+	#pragma region Game
 	while (!hitTarget)
 	{
-		//Calculating time
-		deltaTime = deltaClock.getElapsedTime();
-		deltaClock.restart();
-		// Advances world by num of seconds
-		world.Step(deltaTime.asSeconds(), 6, 2);
+		Update(world, deltaClock);
 
-		//Update position
-		position = body->GetPosition();
-		point = body->GetWorldPoint(position);
-
+		//Update position of snake
+		b2Vec2 position = body->GetPosition();
+		b2Vec2 point = body->GetWorldPoint(position);
 
 		//Round positions to tenths
 		double positionX = std::round(position.x * 10) / 10;
 		double positionY = std::round(position.y * 10) / 10;
 
-		std::cout << "Target "<< targetPos.x << ", " << targetPos.y << " --> " << "Snake " << positionX << ", " << positionY << std::endl;
+		// Display targets and snakes location
+		Display(targetPos.x, targetPos.y, positionX, positionY);
 
-		// if escape is pressed set running to false
-		bool quit = false;
-
-		// Check for keyboard input
-		// Add a force to the game
-		if (_kbhit()) { 
-			// Get the character of the key pressed
-			char key = _getch();
-			switch (key) {
-			case 27:
-				std::cout << "\nTHANKS FOR PLAYING";
-				hitTarget = true;
-				break;
-			case 'w': {
-				ApplyForces(119, body);
-				jump_pressed = false;
-				break;
-			}
-			case 'a': {
-				ApplyForces(97, body);
-				jump_pressed = false;
-			}
-				break;
-			case 's':
-				ApplyForces(115, body);
-				jump_pressed = false;
-				break;
-			case 'd':
-				ApplyForces(100, body);
-				jump_pressed = false;
-				break;
-			case 32:
-				// Check if 'Jump' has not been pressed before
-				if (!jump_pressed) { 
-					ApplyForces(32, body);
-					// Set the flag to indicate 'Jump' has been pressed
-					jump_pressed = true; 
-				}
-				break;
-			default:
-				break;
-			}
-		}
-
-		// If distance between target and snake is close mark target as hit
-		if (b2Distance(position, targetPos) < 0.1f)
+		/* Check for keyboard input
+		* Depending on button press
+		* apply a force in a direction*/
+		if (_kbhit())
 		{
-			hitTarget = true;
-			std::cout << "Target " << targetPos.x << ", " << targetPos.y << 
-			    " --> " << "Snake " << positionX << ", " << positionY << "	(TARGET HIT)" << std::endl;
+			char key = _getch();
+			ApplyForces(key, body, targetPos, jump_pressed);
+			
+			if (key == 27) // If esc key is pressed
+			{
+				system("Color 0B");
+				std::cout << "\nTHANKS FOR PLAYING" <<
+							"	FINAL SCORE: " << score << std::endl;
+				hitTarget = true;
+			}
 		}
+	#pragma endregion
+
+	/* The if statement below does 2 things
+	* 1. Determine if a target is close enough and increase score
+	* 2. Every 2 points, ask the user if they would like to continue or quit 
+	*/
+	#pragma region Target/Score syst.
+		if (b2Distance(position, targetPos) < 0.2f)
+		{
+			score++;
+			if (score % 2 == 0 && score != 0)
+			{
+				hitTarget = true;
+				system("Color 0B");
+				std::cout << "\n\nNice job! You hit: " << score << " targets." 
+							<< "\nPress Enter to continue..." 
+							<< "\nPress Esc to quit..." << std::endl;
+
+				bool validInput = false;
+				while (!validInput)
+				{
+
+					char key = _getch();
+					switch (key) {
+						// If player wants to quit
+					case 27:
+					{
+						system("Color 0B");
+						std::cout << "\n\nWell Done!\t" << "Final Score: " << score << std::endl;
+						validInput = true;
+						break;
+					}
+					// If player wants to continue 
+					case 13:
+						system("Color 0F");
+						hitTarget = false; //Resume game loop
+						validInput = true;
+						break;
+					default:
+						break;
+					}
+				}
+			}
+
+			targetPos = MoveTarget(&targetPos);
+		}
+	#pragma endregion
 
 	}
-	return 0;
+	
 }
 
 
