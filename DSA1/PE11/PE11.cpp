@@ -2,11 +2,37 @@
 //
 
 #include <iostream>
+#include <vector>
+#include "Item.h"
+#include "Sword.h"
+#include "Helmet.h"
+#include "Armor.h"
+#include "Shield.h"
 using namespace std;
 
 int main()
 {
-    std::cout << "Hello World!\n";
+	Sword* sword = new Sword("Sword", 50, 10, 100);
+	Helmet* helmet = new Helmet("Helmet", 3, 7, 90);
+	Armor* armor = new Armor("Armor", 2, 9, 60);
+	Shield* shield = new Shield("Shield", 5, 8, 30);
+
+	std::vector<Item*> inventory;
+
+	inventory.push_back(sword);
+	inventory.push_back(helmet);
+	inventory.push_back(armor);
+	inventory.push_back(shield);
+
+	for (int i = 0; i < inventory.size(); i++)
+	{
+		inventory[i]->print();
+	}
+
+	delete sword;
+	delete helmet;
+	delete armor;
+	delete shield;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
