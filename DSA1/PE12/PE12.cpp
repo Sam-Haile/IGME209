@@ -5,17 +5,27 @@
 #include <memory>
 #include "Level.h"
 
+void CreatePointer() {
+
+	// Declare level pointer
+	Level* lvlPtr = new Level;
+}
+
+
+void CreateSmartPointer() {
+
+	// Declare a smart pointer
+	std::shared_ptr<Level> lvlSmrtPtr;
+	// Assign it to new keyword
+	lvlSmrtPtr = std::make_shared<Level>();
+}
+
 int main()
 {
 
-    Level level = new Level();
-
-
-
-
-
-
-
+	CreatePointer();
+	CreateSmartPointer();
+	_CrtDumpMemoryLeaks();
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

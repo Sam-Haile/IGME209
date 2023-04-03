@@ -6,6 +6,7 @@ using namespace std;
 
 Level::Level()
 {
+	std::cout << "Constructor Executed" << std::endl;
 	m_levelNumber = 0;
 	m_exitLocation = "Exit Door";
 	m_numOfEnemies[0] = "Enemy1";

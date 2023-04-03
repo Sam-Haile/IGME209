@@ -11,14 +11,11 @@ public:
 	std::string m_exitLocation;
 	std::string m_numOfEnemies[3];
 	
-	Level()
-	{
-		std::cout << "Constructor Executed" << endl;
-	}
+	Level();
 
 	~Level() {
 
-		std::cout << "Destructor Executed" << endl;
+		std::cout << "Destructor Executed" << std::endl;
 	}
 	
 
