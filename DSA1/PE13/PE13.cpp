@@ -25,7 +25,7 @@ int HandCounterRecursive(int numOfSeats)
         }
 
     }
-    std::cout << numOfHands;
+    std::cout << "Recursive Method with " << numOfSeats << " seats =  " << numOfHands << std::endl;
     return numOfHands;
     
 }
@@ -49,7 +49,7 @@ int HandCounterIterative(int numOfSeats)
         }
     }
 
-    std::cout << numOfHands;
+    std::cout << "Iterative Method with "<< numOfSeats << " seats =  " << numOfHands << std::endl;
     return numOfHands;
 
 }
@@ -63,25 +63,15 @@ int HandCounterFormula(float numOfSeats)
     int numOfHands = 0;
 
     numOfHands = oddNum * 3 + evenNum * 4;
-    std::cout << numOfHands;
+    std::cout << "Formula Method with " << numOfSeats << " seats =  " << numOfHands << std::endl;
     return numOfHands;
-
 }
 
 int main()
 {
-    
-    HandCounterFormula(4);
-
-
-
-
-
-
-
-
-
-
+    HandCounterIterative(3);
+    HandCounterRecursive(3);
+    HandCounterFormula(3);
 }
 
 
