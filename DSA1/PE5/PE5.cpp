@@ -9,6 +9,19 @@ int main()
 
     // create the window
     sf::RenderWindow window(sf::VideoMode(800, 600), "My window");
+    // Define circle
+    sf::CircleShape circle(100);
+    // Define rectangle
+    sf::RectangleShape rectangle(sf::Vector2f(120, 50));
+    // Define triangle
+    sf::CircleShape circleTwo(75);
+
+    // set the circle color to green
+    circle.setFillColor(sf::Color(100, 250, 50));
+
+    circle.move(150, 150);
+    rectangle.move(300, 400);
+    circleTwo.move(500, 150);
 
     // run the program as long as the window is open
     while (window.isOpen())
@@ -25,21 +38,7 @@ int main()
         // clear the window with black color
         window.clear(sf::Color::Black);
 
-        // Define circle
-        sf::CircleShape circle(50);
-        // Define rectangle
-        sf::RectangleShape rectangle(sf::Vector2f(120, 50));
-        // Define triangle
-        sf::CircleShape circleTwo(75);
 
-
-
-        // set the circle color to green
-        circle.setFillColor(sf::Color(100, 250, 50));
-
-        circle.move(150, 150);
-        rectangle.move(300, 400);
-        circleTwo.move(500, 150);
 
         window.draw(circle);
         window.draw(rectangle);
