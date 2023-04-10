@@ -76,3 +76,10 @@ void Score::formatScoree(std::stringstream ss)
     sf::Text text;
     //text.setPosition(sf::Vector2f(300, 725));
 }
+
+void Score::drawScore(sf::RenderWindow& window, Score score ) {
+
+    window.draw(score.getTargetBox());
+    window.draw(score.getScoreText());
+    window.draw(score.getTargetText());
+}

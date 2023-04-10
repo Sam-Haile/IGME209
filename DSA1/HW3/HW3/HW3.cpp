@@ -5,7 +5,6 @@
 Not sure if this counts but I  made my game 
 resemble Kirby's dream land from the game boy
 */
-
 #include <iostream>
 #include <GravitySnake.h>
 #include <iomanip>
@@ -17,9 +16,8 @@ resemble Kirby's dream land from the game boy
 #include "Functions.h"
 #include "Score.h"
 #include "Kirby.h"
+#include "Game.h"
 using namespace std;
-
-
 
 int main()
 {
@@ -31,15 +29,7 @@ int main()
 	//These functions are from the DLL.
 	initVariables(b2Vec2(0.0f, -9.8f));
 	Kirby kirby;
-	// Creating the walls/floor
-	b2Vec2 box2DLWall = b2Vec2(0.2f, 0.0f);
-	createLeftWall(b2Vec2(box2DLWall), 0.0f, 8.0f);
-	b2Vec2 box2DRWall = b2Vec2(7.8f, 0.0f);
-	createRightWall(b2Vec2(box2DRWall), 0.0f, 8.0f);
-	b2Vec2 box2DFloorPos = b2Vec2(0.0f, -7.4f);
-	createFloor(b2Vec2(box2DFloorPos), 10.0f, 0.0f);
-	b2Vec2 box2DCeiling = b2Vec2(0.0f, -0.0f);
-	createCeiling(b2Vec2(box2DCeiling), 10.0f, 0.0f);
+
 
 #pragma region Title Screen
 
@@ -71,40 +61,6 @@ int main()
 
 #pragma endregion
 
-#pragma region Background Texture
-	// Load background and scale it up
-	sf::Texture t_background;	
-	if (!t_background.loadFromFile("assets/bubbly_clouds.png"))
-		sf::err() << "Error: The file is not found!" << std::endl;
-	sf::Sprite s_background(t_background);
-	float scaleFactor = 800 / s_background.getTextureRect().width;
-	s_background.setScale(scaleFactor, scaleFactor);
-	s_background.setPosition(0, -1596 * scaleFactor + 800);
-	float backgroundSpeed = .09f;
-#pragma endregion
-
-#pragma region Creating Items
-
-	// Initialize a std vector to hold the various items
-	std::vector<sf::Texture> items;
-	sf::Texture item1, item2, item3, item4, item5, item6, item7;
-
-	// Load the sprites into the vector
-	for (int i = 1; i < 8; i++)
-	{
-		sf::Texture texture;
-		if (!texture.loadFromFile("assets/item" + std::to_string(i) + ".png"))
-			sf::err() << "Error: The file is not found!" << std::endl;
-		items.push_back(texture);
-	}
-
-	// create the targets random pos
-	b2Vec2 box2DTarget = getTargetPosition();
-	// Give it 64x64 size
-	sf::RectangleShape targetShape(sf::Vector2f(64, 64));
-	targetShape.setTexture(&items[randomNumber()]);
-
-#pragma endregion
 	
 #pragma region Controls
 	
@@ -146,38 +102,14 @@ int main()
 
 #pragma endregion
 
-
-	
-
-#pragma region Initialize/Move Objects
-
-	// Object Sizes
 	sf::RenderWindow window(sf::VideoMode(800, 800), "Gravity Snake");
-	sf::RectangleShape leftWall(sf::Vector2f(-20, 800));
-	sf::RectangleShape rightWall(sf::Vector2f(20, 800));
-	sf::RectangleShape floor(sf::Vector2f(800, 60));
-	sf::Texture gameUI;
-	if (!gameUI.loadFromFile("assets/Floor.png"))
-		sf::err() << "Error: The file is not found!" << std::endl;
-	floor.setTexture(&gameUI);
-
-	sf::RectangleShape ceiling(sf::Vector2f(800, 20));
-
-	// Set their respective position
-	leftWall.setPosition(Box2DToSFML(box2DLWall));
-	rightWall.setPosition(Box2DToSFML(box2DRWall));
-	floor.setPosition(Box2DToSFML(box2DFloorPos));
-	ceiling.setPosition(Box2DToSFML(box2DCeiling));
-	targetShape.setPosition(Box2DToSFML(box2DTarget));
-
-#pragma endregion
-	
+	Game game;
+	game.createObjects();
 	
 	int targetNeeded = 5;
 	Score score(font, targetNeeded, sf::Vector2f(300, 725));
 
 	bool spawnObjects = true;
-	bool move = false;
 	sf::Clock clock;
 	
 	// run the program as long as the window is open
@@ -191,27 +123,16 @@ int main()
 			if (event.type == sf::Event::Closed)
 				window.close();
 		}
+		
 		window.clear(sf::Color::Black);
 		float deltaTime = updateWorldAndReturnDeltaTime();
 
 
 		kirby.move();
-
-		//Process input and apply forces to the snake.
-		if (move)
-		{
-			handleInput();
-		}
+		handleInput();
 
 		kirby.playerUpdate();
-
-		// move background
-		s_background.move(0, backgroundSpeed);
-		// Checks if sprite is off screen
-		if (s_background.getPosition().y >= 0)
-		{
-			backgroundSpeed = 0;
-		}
+		game.moveBackground(0.5f);
 
 		window.draw(whiteBox);
 		window.draw(s_logo);
@@ -222,39 +143,27 @@ int main()
 
 		if (clock.getElapsedTime().asSeconds() > .5f) {
 
-			move = true;
-			// draw everything here...
-			window.draw(s_background);
+			game.drawObjects(window, true);
 			kirby.draw(window);
-			window.draw(leftWall);
-			window.draw(rightWall);
-			window.draw(floor);
-			window.draw(ceiling);
-			window.draw(score.getTargetBox());
-			window.draw(score.getScoreText());
-			window.draw(score.getTargetText());
-			if (spawnObjects)
-			{
-				window.draw(targetShape);
-			}
+			score.drawScore(window, score);
+			
 		}
 
 		// Checks for collision
 		if (checkCollisionAndMoveTarget(1.0f) && spawnObjects)
 		{
-			// Display at random position
-			box2DTarget = getTargetPosition();
-			targetShape.setPosition(Box2DToSFML(box2DTarget));
+			//// Display at random position
+			game.randomPos();
 
 			sound.play();
-
 			// Increase score and reduce target count
 			targetNeeded--;
 			score.increaseScore(100);
 			score.setTargetsNeeded(targetNeeded);
-			
-			// Spawn random item
-			targetShape.setTexture(&items[randomNumber()]);
+			//
+			//// Spawn random item
+			game.setNewItem();
+			//targetShape.setTexture(&items[randomNumber()]);
 		}
 		else if (score.getTargetsNeeded() <= 0)
 		{
@@ -265,6 +174,6 @@ int main()
 		// end the current frame
 		window.display();
 	}
-	releaseVariables();
+	void releaseVariables();
 
 }

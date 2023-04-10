@@ -152,12 +152,14 @@ openal32.lib
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Functions.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="HW3.cpp" />
     <ClCompile Include="Kirby.cpp" />
     <ClCompile Include="Score.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Functions.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="Kirby.h" />
     <ClInclude Include="Score.h" />
   </ItemGroup>

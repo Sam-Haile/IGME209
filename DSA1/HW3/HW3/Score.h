@@ -20,6 +20,7 @@ public:
     sf::Text getScoreText() const;
     sf::Text getTargetText() const;
     sf::RectangleShape getTargetBox() const;
+    void drawScore(sf::RenderWindow& window, Score score);
 
 private:
     sf::Font& font;
@@ -28,7 +29,6 @@ private:
     sf::Text scoreText;
     sf::Text targetText;
     sf::RectangleShape box;
-
     std::string formatScore(int score) const;
 };
 
