@@ -15,40 +15,11 @@ resemble Kirby's dream land from the game boy
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include "Functions.h"
+#include "Score.h"
+#include "Kirby.h"
 using namespace std;
 
-/// <summary>
-/// Converts pixel based coordinates (SFML) 
-/// to metric based coordinates (Box2D)
-/// </summary>
-/// <param name="vec"></param>
-/// <returns>A vector 2 in Box2Ds coordinate system</returns>
-b2Vec2 SFMLToBox2D(const sf::Vector2f& vec)
-{
-	return b2Vec2(vec.x / 100.0f, -vec.y / 100.0f);
-}
 
-/// <summary>
-/// Converts metric based coordinates (Box2D) 
-/// to pixel based coordinates (SFML)
-/// </summary>
-/// <param name="vec"></param>
-/// <returns>A vector 2 in SFMLs coordinate system</returns>
-sf::Vector2f Box2DToSFML(const b2Vec2& vec)
-{
-	// Convert SFML vector to Box2D position with the proper scale
-	return sf::Vector2f(vec.x * 100.0f, vec.y * -100.0f);
-}
-
-/// <summary>
-/// Gets the center point of a textbox
-/// </summary>
-/// <param name="text"></param>
-void GetTextCenter(sf::Text& text)
-{
-	sf::FloatRect bounds = text.getLocalBounds(); // get the local bounds of the text
-	text.setOrigin(bounds.left + bounds.width / 2.0f, bounds.top + bounds.height / 2.0f);
-}
 
 int main()
 {
@@ -59,7 +30,7 @@ int main()
 	//Create the physics world, and all the objects. Return a pointer to the snake body.
 	//These functions are from the DLL.
 	initVariables(b2Vec2(0.0f, -9.8f));
-
+	Kirby kirby;
 	// Creating the walls/floor
 	b2Vec2 box2DLWall = b2Vec2(0.2f, 0.0f);
 	createLeftWall(b2Vec2(box2DLWall), 0.0f, 8.0f);
@@ -89,7 +60,6 @@ int main()
 	s_credits.setOrigin(t_credits.getSize().x / 2, t_credits.getSize().y / 2);
 	s_credits.scale(4, 4);
 	s_credits.setPosition(400, 700);
-
 
 	sf::Texture t_gameOver;
 	if (!t_gameOver.loadFromFile("assets/GameOver.png"))
@@ -133,37 +103,14 @@ int main()
 	// Give it 64x64 size
 	sf::RectangleShape targetShape(sf::Vector2f(64, 64));
 	targetShape.setTexture(&items[randomNumber()]);
-#pragma endregion
 
-#pragma region Score Tracking
-	// Score tracking
+#pragma endregion
+	
+#pragma region Controls
+	
 	sf::Font font;
 	if (!font.loadFromFile("assets/ARCADECLASSIC.ttf"))
 		sf::err() << "Error: The font is not found!" << std::endl;
-
-	int score = 0;
-	std::stringstream ss;
-	ss << std::setw(5) << std::setfill('0') << score;
-	sf::Text text;
-	text.setFont(font);
-	text.setString(ss.str());
-	text.setCharacterSize(45);
-	text.setFillColor(sf::Color::Black);
-	text.setPosition(sf::Vector2f(300, 725));
-	
-	int targetsNeeded = 5;
-	sf::Text target_text("Collect " + std::to_string(targetsNeeded), font, 30);
-	target_text.setFillColor(sf::Color::Black);
-	GetTextCenter(target_text);
-	target_text.move(400, 30);
-
-	sf::RectangleShape box(sf::Vector2f(180, 40));
-	box.setOrigin(90, 20);
-	box.move(400, 25);
-
-#pragma endregion
-
-#pragma region Controls
 
 	sf::Text controls_text("Controls", font, 40);
 	controls_text.setFillColor(sf::Color::Black);	
@@ -189,7 +136,7 @@ int main()
 	sf::Music music;
 	if (!music.openFromFile("assets/Float_Islands.wav"))
 		sf::err() << "Error: The song is not found!" << std::endl;
-	music.play();
+	//music.play();
 
 	sf::SoundBuffer item_collect;
 	if (!item_collect.loadFromFile("assets/item_collect.wav"))
@@ -199,22 +146,8 @@ int main()
 
 #pragma endregion
 
-#pragma region Creating Kirby
 
-	// Creating Kirby	
-	b2Body* kirby = createSnake(b2Vec2(5.0f, -1.0f), .5f, .5f);
-	sf::RectangleShape kirbyShape(sf::Vector2f(2 * 100 * 0.5f, 2 * 100 * 0.5f));
-	// set the origin of the shape to its center  
-	kirbyShape.setOrigin(kirbyShape.getSize().x / 2, kirbyShape.getSize().y / 2);
-	sf::Texture t_kirby;
-	if (!t_kirby.loadFromFile("assets/Kirby_Float.png"))
-		sf::err() << "Error: The file is not found!" << std::endl;
-		kirbyShape.setTexture(&t_kirby);
-
-	int kirbySpritePos = 0;
-	kirbyShape.setTextureRect(sf::IntRect(kirbySpritePos, 0, 24, 24));
-
-#pragma endregion
+	
 
 #pragma region Initialize/Move Objects
 
@@ -238,11 +171,15 @@ int main()
 	targetShape.setPosition(Box2DToSFML(box2DTarget));
 
 #pragma endregion
+	
+	
+	int targetNeeded = 5;
+	Score score(font, targetNeeded, sf::Vector2f(300, 725));
 
 	bool spawnObjects = true;
 	bool move = false;
 	sf::Clock clock;
-	sf::Clock clock2;
+	
 	// run the program as long as the window is open
 	while (window.isOpen())
 	{
@@ -254,16 +191,11 @@ int main()
 			if (event.type == sf::Event::Closed)
 				window.close();
 		}
-
-		// Clear the window with black color
 		window.clear(sf::Color::Black);
-		//This function advances the physics world by deltaTime, and returns the deltaTime in seconds.
 		float deltaTime = updateWorldAndReturnDeltaTime();
 
-		// Kirbys Movement
-		b2Vec2 kirbyPos = kirby->GetPosition();
-		sf::Vector2f kirbyPosSFML = Box2DToSFML(kirbyPos);
-		kirbyShape.setPosition(kirbyPosSFML);
+
+		kirby.move();
 
 		//Process input and apply forces to the snake.
 		if (move)
@@ -271,17 +203,7 @@ int main()
 			handleInput();
 		}
 
-		#pragma region Animate Kirby/ Move Background
-
-		if (clock.getElapsedTime().asSeconds() > .1f) {
-			if (kirbySpritePos == 0)
-				kirbySpritePos = 24;
-			else
-				kirbySpritePos = 0;
-
-			kirbyShape.setTextureRect(sf::IntRect(kirbySpritePos, 0, 23, 24));
-			clock.restart();
-		}
+		kirby.playerUpdate();
 
 		// move background
 		s_background.move(0, backgroundSpeed);
@@ -291,8 +213,6 @@ int main()
 			backgroundSpeed = 0;
 		}
 
-		#pragma endregion
-
 		window.draw(whiteBox);
 		window.draw(s_logo);
 		window.draw(s_credits);
@@ -300,19 +220,19 @@ int main()
 		window.draw(jump_text);
 		window.draw(s_keys);
 
-		if (clock2.getElapsedTime().asSeconds() > 3.5f) {
+		if (clock.getElapsedTime().asSeconds() > .5f) {
 
 			move = true;
 			// draw everything here...
 			window.draw(s_background);
-			window.draw(kirbyShape);
+			kirby.draw(window);
 			window.draw(leftWall);
 			window.draw(rightWall);
 			window.draw(floor);
 			window.draw(ceiling);
-			window.draw(text);
-			window.draw(box);
-			window.draw(target_text);
+			window.draw(score.getTargetBox());
+			window.draw(score.getScoreText());
+			window.draw(score.getTargetText());
 			if (spawnObjects)
 			{
 				window.draw(targetShape);
@@ -322,23 +242,21 @@ int main()
 		// Checks for collision
 		if (checkCollisionAndMoveTarget(1.0f) && spawnObjects)
 		{
-			box2DTarget = getTargetPosition();
 			// Display at random position
+			box2DTarget = getTargetPosition();
 			targetShape.setPosition(Box2DToSFML(box2DTarget));
 
-			// Increase score
-			score += 100;
 			sound.play();
-			ss.str("");
-			ss << std::setw(5) << std::setfill('0') << score;
-			text.setString(ss.str());
 
-			// Randomize item
+			// Increase score and reduce target count
+			targetNeeded--;
+			score.increaseScore(100);
+			score.setTargetsNeeded(targetNeeded);
+			
+			// Spawn random item
 			targetShape.setTexture(&items[randomNumber()]);
-			targetsNeeded--;
-			target_text.setString("Collect " + std::to_string(targetsNeeded));
 		}
-		else if (targetsNeeded <= 0)
+		else if (score.getTargetsNeeded() <= 0)
 		{
 			spawnObjects = false;
 			window.draw(whiteBox);
