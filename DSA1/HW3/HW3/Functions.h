@@ -1,8 +1,12 @@
 #pragma once
-#include <Box2D/Box2D.h>
 #define SFML_STATIC
-#include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
+#include <Box2D/Box2D.h>
+#include <GravitySnake.h>
+#include <iostream>
+#include <conio.h>
+#include <ctime>
 
 void display(b2Body* snake);
 void handleInput();

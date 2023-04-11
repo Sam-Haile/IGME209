@@ -4,10 +4,12 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include "Functions.h"
+#include <iostream>
 
 class Game
 {
 private:
+    // GAME
     b2Vec2 m_box2DTarget;
     std::vector<sf::Texture> m_items;
     sf::RectangleShape m_leftWall;
@@ -19,13 +21,15 @@ private:
     sf::Sprite s_background;
     sf::Texture t_background;
 
+
 public:
-    //Game();
-    void moveBackground(float backgroundSpeed);
-    void createObjects();
-    void randomPos();
-    void drawObjects(sf::RenderWindow& window, bool spawn);
+
+    //METHODS FOR THE GAME
+    Game();
     void setNewItem();
+    void itemRandomPos();
+    void moveBackground(float& backgroundSpeed);
+    void drawGameObjects(sf::RenderWindow& window, bool spawn);
 
 };
 

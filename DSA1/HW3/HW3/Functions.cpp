@@ -1,8 +1,5 @@
 #include "Functions.h"
-#include <iostream>
-#include <GravitySnake.h>
-#include <conio.h>
-#include <ctime>
+
 using namespace std;
 
 void display(b2Body* snake)

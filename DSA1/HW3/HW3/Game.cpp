@@ -1,6 +1,6 @@
 #include "Game.h"
 
-void Game::moveBackground(float backgroundSpeed) {
+void Game::moveBackground(float& backgroundSpeed) {
 
 	s_background.move(0, backgroundSpeed);
 	// Checks if sprite is off screen
@@ -8,7 +8,6 @@ void Game::moveBackground(float backgroundSpeed) {
 	{
 		backgroundSpeed = 0;
 	}
-
 }
 
 void Game::setNewItem() {
@@ -16,7 +15,7 @@ void Game::setNewItem() {
 	m_targetShape.setTexture(&m_items[randomNumber()]);
 }
 
-void Game::drawObjects(sf::RenderWindow& window, bool spawn) {
+void Game::drawGameObjects(sf::RenderWindow& window, bool spawn) {
 
 	window.draw(s_background);
 	window.draw(m_leftWall);
@@ -30,14 +29,13 @@ void Game::drawObjects(sf::RenderWindow& window, bool spawn) {
 	}
 }
 
-void Game::randomPos() {
-
+void Game::itemRandomPos() {
 	m_box2DTarget = getTargetPosition();
 	m_targetShape.setPosition(Box2DToSFML(m_box2DTarget));
 }
 
-
-void Game::createObjects() {
+//Creates game objects
+Game::Game() {
 
 	// Load background and scale it up
 	if (!t_background.loadFromFile("assets/bubbly_clouds.png"))
