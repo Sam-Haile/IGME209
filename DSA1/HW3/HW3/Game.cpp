@@ -1,6 +1,11 @@
 #include "Game.h"
 
-void Game::moveBackground(float& backgroundSpeed) {
+/// <summary>
+/// Moves the background and enemies
+/// </summary>
+/// <param name="backgroundSpeed"></param>
+/// <param name="numOfGordo"></param>
+void Game::moveObjects(float& backgroundSpeed, int numOfGordo) {
 
 	s_background.move(0, backgroundSpeed);
 	// Checks if sprite is off screen
@@ -8,6 +13,12 @@ void Game::moveBackground(float& backgroundSpeed) {
 	{
 		backgroundSpeed = 0;
 	}
+
+	for (int i = 0; i < m_listOfGordos.size(); i++)
+	{
+		m_listOfGordos[i].move(0, backgroundSpeed);
+	}
+
 }
 
 void Game::setNewItem() {
@@ -15,26 +26,82 @@ void Game::setNewItem() {
 	m_targetShape.setTexture(&m_items[randomNumber()]);
 }
 
+/// <summary>
+/// Draws the games background, 
+/// </summary>
+/// <param name="window"></param>
+/// <param name="spawn"></param>
 void Game::drawGameObjects(sf::RenderWindow& window, bool spawn) {
 
 	window.draw(s_background);
+	if (spawn)
+	{
+		for (int i = 0; i < m_listOfGordos.size(); i++)
+		{
+			window.draw(m_listOfGordos[i]);
+		}
+		window.draw(m_targetShape);
+	}
 	window.draw(m_leftWall);
 	window.draw(m_rightWall);
 	window.draw(m_ceiling);
 	window.draw(m_floor);
-
-	if (spawn)
-	{
-		window.draw(m_targetShape);
-	}
 }
 
+/// <summary>
+/// Display item at a random position
+/// </summary>
 void Game::itemRandomPos() {
 	m_box2DTarget = getTargetPosition();
 	m_targetShape.setPosition(Box2DToSFML(m_box2DTarget));
 }
 
-//Creates game objects
+/// <summary>
+/// Spawn the requested number of 
+/// gordos and randomly set their position
+/// </summary>
+/// <param name="numOfGordos"></param>
+void Game::generateGordo(int numOfGordos) {
+	
+	sf::Vector2f pos;
+	sf::Texture gordo;
+	if (!m_gordo.loadFromFile("assets/gordo.png"))
+		sf::err() << "Error: The file is not found!" << std::endl;
+
+
+	// Load the sprites into the vector
+	for (int i = 1; i < numOfGordos; i++)
+	{
+		sf::RectangleShape gordoObj;
+		gordoObj.setTexture(&m_gordo);
+		gordoObj.setSize(sf::Vector2f(64, 64));
+		gordoObj.setOrigin(32,32);
+		pos = getRandomPosition(0, 0, 780, 0);
+		gordoObj.setPosition(pos);
+		m_listOfGordos.push_back(gordoObj);
+	}
+
+}
+
+
+/// <summary>
+/// Animate the gordos
+/// </summary>
+void Game::animate() {
+
+	if (m_clock.getElapsedTime().asSeconds() > .5f) {
+		for (int i = 0; i < m_listOfGordos.size(); i++)
+		{
+			sf::Vector2f scale = m_listOfGordos[i].getScale();
+			m_listOfGordos[i].setScale(-scale.x, scale.y);
+			m_clock.restart();
+		}
+	}
+}
+
+/// <summary>
+/// Main game logic
+/// </summary>
 Game::Game() {
 
 	// Load background and scale it up
@@ -57,13 +124,11 @@ Game::Game() {
 	s_background.setPosition(0, -1596 * scaleFactor + 800);
 	float backgroundSpeed = .09f;
 
-	// Initialize a std vector to hold the various items
-	sf::Texture item1, item2, item3, item4, item5, item6, item7;
-
+	
+	sf::Texture texture;
 	// Load the sprites into the vector
 	for (int i = 1; i < 8; i++)
 	{
-		sf::Texture texture;
 		if (!texture.loadFromFile("assets/item" + std::to_string(i) + ".png"))
 			sf::err() << "Error: The file is not found!" << std::endl;
 		m_items.push_back(texture);
@@ -86,7 +151,6 @@ Game::Game() {
 		sf::err() << "Error: The file is not found!" << std::endl;	
 	m_floor.setTexture(&m_gameUI);
 
-
 	// Set their respective position
 	m_leftWall.setPosition(Box2DToSFML(box2DLWall));
 	m_rightWall.setPosition(Box2DToSFML(box2DRWall));
@@ -97,4 +161,40 @@ Game::Game() {
 }
 
 
+/// <summary>
+/// Retreive a random position 
+/// </summary>
+/// <param name="minX"></param>
+/// <param name="minY"></param>
+/// <param name="maxX"></param>
+/// <param name="maxY"></param>
+/// <returns>Returns a random vector 2 position</returns>
+sf::Vector2f Game::getRandomPosition(float minX, float minY, float maxX, float maxY) {
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<float> xDist(minX, maxX);
+	std::uniform_real_distribution<float> yDist(minY, maxY);
+	float x = xDist(gen);
+	float y = yDist(gen);
+	return sf::Vector2f(x, y);
+}
 
+
+std::vector<sf::RectangleShape>& Game::getListOfEnemies() {
+	return m_listOfGordos;
+}
+
+/// <summary>
+/// Checks for collision between the player and enemies
+/// </summary>
+/// <param name="playerRect"></param>
+void Game::enemyCollision(sf::RectangleShape& playerRect) {
+
+	for (int i = 0; i < m_listOfGordos.size(); i++)
+	{
+		if (m_listOfGordos[i].getGlobalBounds().intersects(playerRect.getGlobalBounds()))
+		{
+			//LOSE A HEALTH POINT
+		}
+	}
+}

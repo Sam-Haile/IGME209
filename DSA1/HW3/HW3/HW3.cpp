@@ -38,6 +38,8 @@ int main()
 
 	MainMenu mainMenu(font);
 	Game game;
+	int numOfGordo = 5;
+	float spawnSpeed = 5.0f;
 	Kirby kirby;
 	Audio audio;
 
@@ -46,8 +48,9 @@ int main()
 	
 	bool spawnObjects = true;
 	sf::Clock clock;
-	float scrollSpeed = 0.1f;
+	sf::Clock clock2;
 
+	float scrollSpeed = 0.1f;
 
 	// run the program as long as the window is open
 	while (window.isOpen())
@@ -64,29 +67,39 @@ int main()
 		window.clear(sf::Color::Black);
 		float deltaTime = updateWorldAndReturnDeltaTime();
 
-
-		kirby.move();
 		handleInput();
 		kirby.playerUpdate();
-
-		game.moveBackground(scrollSpeed);
-
+		game.animate();
 		mainMenu.drawObjects(window);
 
-		if (clock.getElapsedTime().asSeconds() > 1.5f) {
 
+		if (clock.getElapsedTime().asSeconds() > 1.5f) {
+		
 			game.drawGameObjects(window, true);
 			kirby.draw(window);
 			score.drawScore(window, score);
+			game.moveObjects(scrollSpeed, numOfGordo);
+			
+			if (clock2.getElapsedTime().asSeconds() > spawnSpeed)
+			{
+				game.generateGordo(numOfGordo);
+				clock2.restart();
+			}
 		}
 
-		// Checks for collision
+		
+		//Reference to list of enemies and kirbys rectangles
+		sf::RectangleShape& playerRect = kirby.getPlayerRect();
+
+		//Checks for collision between player and enemy
+		game.enemyCollision(playerRect);
+		// Checks for collision with items
 		if (checkCollisionAndMoveTarget(1.0f) && spawnObjects)
 		{
 			//// Display at random position
 			game.itemRandomPos();
-
 			audio.playItemCollect();
+
 			// Increase score and reduce target count
 			targetNeeded--;
 			score.increaseScore(100);
@@ -94,7 +107,6 @@ int main()
 			
 			// Spawn random item
 			game.setNewItem();
-			//targetShape.setTexture(&items[randomNumber()]);
 		}
 		else if (score.getTargetsNeeded() <= 0)
 		{
@@ -105,5 +117,4 @@ int main()
 		window.display();
 	}
 	void releaseVariables();
-
 }

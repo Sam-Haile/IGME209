@@ -8,6 +8,7 @@ public:
     void playerUpdate();
     void move();
     void draw(sf::RenderWindow& window) const;
+    sf::RectangleShape& getPlayerRect();
 private:
     b2Body* m_body;
     sf::RectangleShape m_shape;
