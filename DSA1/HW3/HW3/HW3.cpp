@@ -23,6 +23,14 @@ using namespace std;
 
 int main()
 {
+	int numOfGordo = 3;			// Number of enemies that spawn per wave
+	int targetNeeded = 12;		// Targets needed for game
+	float spawnRate = 4.0f;		// Set frequency of spawn rate for enemies
+	bool spawnObjects = true;	// Spawns object until game is done
+	bool showMainMenu = true;	// Draw menu for X amount of time
+	float scrollSpeed = 0.1f;	// Speed of background paralax
+	float gordoSpeed = 0.1f;	// Speed of background paralax
+
 	// Improves formatting of console output.
 	cout << fixed << showpoint << setprecision(2);
 
@@ -30,27 +38,20 @@ int main()
 	//Create the physics world, and all the objects. Return a pointer to the body.
 	//These functions are from the DLL.
 	initVariables(b2Vec2(0.0f, -9.8f));
+	// Load window and font
 	sf::RenderWindow window(sf::VideoMode(800, 800), "Gravity Snake");
-
 	sf::Font font;
 	if (!font.loadFromFile("assets/ARCADECLASSIC.ttf"))
 		sf::err() << "Error: The font is not found!" << std::endl;
 
-	MainMenu mainMenu(font);
+	// Initialize game components
 	Game game;
-	int numOfGordo = 5;
-	float spawnSpeed = 5.0f;
 	Kirby kirby;
 	Audio audio;
-
-	int targetNeeded = 5;
-	Score score(font, targetNeeded, sf::Vector2f(300, 725));
-	
-	bool spawnObjects = true;
 	sf::Clock clock;
-	sf::Clock clock2;
-
-	float scrollSpeed = 0.1f;
+	sf::Clock enemySpawner;
+	MainMenu mainMenu(font);
+	Score score(font, targetNeeded, sf::Vector2f(300, 725));
 
 	// run the program as long as the window is open
 	while (window.isOpen())
@@ -66,33 +67,39 @@ int main()
 
 		window.clear(sf::Color::Black);
 		float deltaTime = updateWorldAndReturnDeltaTime();
-
+		kirby.move();
 		handleInput();
+
+		//Animates kirby and gordo
 		kirby.playerUpdate();
 		game.animate();
-		mainMenu.drawObjects(window);
 
+		if (showMainMenu)
+		{
+			mainMenu.drawObjects(window);
+		}
 
 		if (clock.getElapsedTime().asSeconds() > 1.5f) {
 		
+			window.clear(sf::Color::Black);
+			showMainMenu = false;
 			game.drawGameObjects(window, true);
 			kirby.draw(window);
+			game.moveObjects(scrollSpeed, gordoSpeed);
 			score.drawScore(window, score);
-			game.moveObjects(scrollSpeed, numOfGordo);
-			
-			if (clock2.getElapsedTime().asSeconds() > spawnSpeed)
-			{
-				game.generateGordo(numOfGordo);
-				clock2.restart();
-			}
 		}
 
-		
+		if (enemySpawner.getElapsedTime().asSeconds() > spawnRate)
+		{
+			game.generateGordo(numOfGordo);
+			enemySpawner.restart();
+		}
+
 		//Reference to list of enemies and kirbys rectangles
 		sf::RectangleShape& playerRect = kirby.getPlayerRect();
 
 		//Checks for collision between player and enemy
-		game.enemyCollision(playerRect);
+		game.enemyCollision(playerRect, &spawnObjects);
 		// Checks for collision with items
 		if (checkCollisionAndMoveTarget(1.0f) && spawnObjects)
 		{
@@ -108,13 +115,16 @@ int main()
 			// Spawn random item
 			game.setNewItem();
 		}
-		else if (score.getTargetsNeeded() <= 0)
+		else if (score.getTargetsNeeded() <= 0 || !spawnObjects)
 		{
 			spawnObjects = false;
+			window.clear(sf::Color::Black);
 			mainMenu.drawBox(window);
 		}
 		// end the current frame
 		window.display();
 	}
+
+
 	void releaseVariables();
 }

@@ -58,5 +58,14 @@ void MainMenu::drawObjects(sf::RenderWindow& window)
 
 void MainMenu::drawBox(sf::RenderWindow& window)
 {
-	window.draw(m_whiteBox);
+	//window.draw(m_whiteBox);
+
+	if (!m_gameOverTexture.loadFromFile("assets/GameOver.png"))
+		sf::err() << "Error: The file is not found!" << std::endl;
+	m_gameOverSprite.setTexture(m_gameOverTexture);
+	m_gameOverSprite.setOrigin(m_gameOverTexture.getSize().x / 2, m_gameOverTexture.getSize().y / 2);
+	m_gameOverSprite.setScale(5.6, 5.6);
+	m_gameOverSprite.setPosition(400, 400);
+
+	window.draw(m_gameOverSprite);
 }

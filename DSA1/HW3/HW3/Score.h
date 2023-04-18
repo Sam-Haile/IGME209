@@ -15,7 +15,6 @@ public:
 
     void setTargetsNeeded(int targetsNeeded);
     int getTargetsNeeded() const;
-    void formatScoree(std::stringstream ss);
 
     sf::Text getScoreText() const;
     sf::Text getTargetText() const;

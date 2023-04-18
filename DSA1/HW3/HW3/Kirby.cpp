@@ -23,7 +23,9 @@ Kirby::Kirby() {
 void Kirby::playerUpdate() {
    
     // Kirbys Movement
-    move();
+    b2Vec2 kirbyPos = m_body->GetPosition();
+    sf::Vector2f kirbyPosSFML = Box2DToSFML(kirbyPos);
+    m_shape.setPosition(kirbyPosSFML);
 
     if (m_clock.getElapsedTime().asSeconds() > .1f) {
         if (m_spritePos == 0)
@@ -48,7 +50,7 @@ void Kirby::draw(sf::RenderWindow& window) const {
 /// Moves Kirby
 /// </summary>
 void Kirby::move() {
-    
+
     // Kirbys Movement
     b2Vec2 kirbyPos = m_body->GetPosition();
     sf::Vector2f kirbyPosSFML = Box2DToSFML(kirbyPos);

@@ -22,6 +22,9 @@ private:
 	sf::Texture m_creditsTexture;
 	sf::Sprite m_creditsSprite;
 
+	sf::Texture m_gameOverTexture;
+	sf::Sprite m_gameOverSprite;
+
 public:
 	MainMenu(sf::Font& font);
 	void drawObjects(sf::RenderWindow& window);

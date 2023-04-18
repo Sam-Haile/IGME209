@@ -12,32 +12,36 @@ class Game
 {
 private:
     // GAME
+    sf::Clock m_clock;
+    int x_spacing = 300;
+    sf::Texture t_gordo;
+    sf::Texture t_health;
+    sf::Texture t_gameUI;
     b2Vec2 m_box2DTarget;
-    std::vector<sf::Texture> m_items;
-    std::vector<sf::RectangleShape> m_listOfGordos;
-    sf::Texture m_gordo;
-    sf::RectangleShape m_leftWall;
-    sf::RectangleShape m_rightWall;
-    sf::RectangleShape m_floor;
-    sf::RectangleShape m_ceiling;
-    sf::RectangleShape m_targetShape;
-    sf::Texture m_gameUI;
     sf::Sprite s_background;
     sf::Texture t_background;
-    sf::Clock m_clock;
-
+    sf::RectangleShape m_floor;
+    sf::RectangleShape m_ceiling;
+    sf::RectangleShape m_leftWall;
+    sf::RectangleShape m_rightWall;
+    sf::RectangleShape m_healthRect;
+    std::vector<sf::Texture> t_items;
+    sf::RectangleShape m_targetShape;
+    std::vector<sf::RectangleShape> m_listOfGordos;
+    std::vector < sf::RectangleShape*> m_listOfHearts;
 
 public:
 
     //METHODS FOR THE GAME
     Game();
+    void animate();
     void setNewItem();
     void itemRandomPos();
-    void enemyCollision(sf::RectangleShape& playerRect);
-    void animate();
     void generateGordo(int numOfGordos);
-    void moveObjects(float& backgroundSpeed, int numOfGordo);
-    void drawGameObjects(sf::RenderWindow& window, bool spawn);
-    sf::Vector2f getRandomPosition(float minX, float minY, float maxX, float maxY);
+    void drawHearts( sf::RenderWindow& window);
     std::vector<sf::RectangleShape>& getListOfEnemies();
+    void drawGameObjects(sf::RenderWindow& window, bool spawn);
+    void moveObjects(float& backgroundSpeed, float& gordoSpeed);
+    void enemyCollision(sf::RectangleShape& playerRect, bool* gameOver);
+    sf::Vector2f getRandomPosition(float minX, float minY, float maxX, float maxY);
 };

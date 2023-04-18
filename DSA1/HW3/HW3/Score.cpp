@@ -70,13 +70,6 @@ std::string Score::formatScore(int score) const {
     return ss.str();
 }
 
-void Score::formatScoree(std::stringstream ss)
-{
-    ss << std::setw(5) << std::setfill('0') << score;
-    sf::Text text;
-    //text.setPosition(sf::Vector2f(300, 725));
-}
-
 void Score::drawScore(sf::RenderWindow& window, Score score ) {
 
     window.draw(score.getTargetBox());
